@@ -57,7 +57,7 @@ export default function CentralControlTower() {
                 <h1 className="text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-500 to-emerald-400">
                   Control Tower Terpusat
                 </h1>
-                <Badge size="md" color="indigo" className="rounded-full px-4 py-1">Enterprise AI v2.5</Badge>
+                <Badge size="md" color="indigo" className="rounded-full px-4 py-1">Enterprise</Badge>
               </div>
               <Flex className="space-x-4">
                 <Text className="text-slate-400 font-semibold tracking-tight">Digitalization System by Dicky Ardiansyah</Text>
