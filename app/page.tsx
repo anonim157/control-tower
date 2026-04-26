@@ -1,18 +1,17 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import {
   Card, Grid, Title, Text, Flex, Badge, Metric, Button, TabGroup, TabList, Tab,
-  Tracker, AreaChart, BarList, DonutChart, Table, TableHead, TableRow, TableHeaderCell, 
-  TableBody, TableCell, Icon, TextInput, ProgressBar, Divider, Accordion, AccordionBody, AccordionHeader
+  AreaChart, BarList, DonutChart, Table, TableHead, TableRow, TableHeaderCell, 
+  TableBody, TableCell, Icon, TextInput, ProgressBar
 } from "@tremor/react";
 import { 
   MapIcon, ChartBarIcon, CpuChipIcon, ExclamationTriangleIcon, 
-  MagnifyingGlassIcon, ArrowPathIcon, BoltIcon, CloudIcon,
-  ShieldCheckIcon, BeakerIcon, AdjustmentsHorizontalIcon,
-  BellIcon, ClipboardDocumentListIcon, LightBulbIcon
+  MagnifyingGlassIcon, BoltIcon, ShieldCheckIcon, BeakerIcon, 
+  AdjustmentsHorizontalIcon, BellIcon, ClipboardDocumentListIcon, LightBulbIcon
 } from "@heroicons/react/24/outline";
 
 // --- Service & Store Integration ---
@@ -26,9 +25,6 @@ const MapLayer = dynamic(() => import("./components/MapLayer"), {
   loading: () => <div className="h-[600px] w-full bg-slate-900/50 animate-pulse rounded-xl border border-slate-800" />
 });
 
-// ==========================================================
-// MAIN CONTROLLER: GLOBAL CONTROL TOWER V2.5
-// ==========================================================
 export default function CentralControlTower() {
   const [view, setView] = useState<"global" | "plant" | "machine">("global");
   const [activePlantId, setActivePlantId] = useState<string | null>(null);
@@ -42,7 +38,6 @@ export default function CentralControlTower() {
     return () => disconnectMQTT();
   }, []);
 
-  // Navigation Logic
   const handleSelectPlant = (id: string) => { setActivePlantId(id); setView("plant"); };
   const handleSelectMachine = (id: string) => { setActiveMachineId(id); setView("machine"); };
   const resetToGlobal = () => { setView("global"); setActivePlantId(null); setActiveMachineId(null); };
@@ -50,8 +45,8 @@ export default function CentralControlTower() {
   return (
     <div className="min-h-screen bg-[#020617] p-6 md:p-10 text-slate-100 font-sans selection:bg-indigo-500/30">
       
-      {/* SECTION 1: DYNAMIC HEADER SYSTEM */}
-      <header className="mb-10 flex flex-col xl:flex-row justify-between items-start xl:items-center border-b border-slate-800 pb-10 gap-8 animate-in fade-in duration-700">
+      {/* SECTION 1: HEADER */}
+      <header className="mb-10 flex flex-col xl:flex-row justify-between items-start xl:items-center border-b border-slate-800 pb-10 gap-8">
         <Flex justifyContent="start" className="space-x-6">
            <div className="relative group flex-shrink-0">
               <div className="absolute inset-0 bg-amber-500 rounded-full blur-3xl opacity-5 group-hover:opacity-15 transition-opacity"></div>
@@ -62,7 +57,7 @@ export default function CentralControlTower() {
                 <h1 className="text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-500 to-emerald-400">
                   Control Tower Terpusat
                 </h1>
-                <Badge size="md" color="indigo" className="rounded-full bg-indigo-500/10 border-indigo-500/30 px-4 py-1">Enterprise AI v2.5</Badge>
+                <Badge size="md" color="indigo" className="rounded-full px-4 py-1">Enterprise AI v2.5</Badge>
               </div>
               <Flex className="space-x-4">
                 <Text className="text-slate-400 font-semibold tracking-tight">Digitalization System by Dicky Ardiansyah</Text>
@@ -76,12 +71,12 @@ export default function CentralControlTower() {
 
         <Grid numItems={1} numItemsSm={3} className="gap-6 w-full xl:w-auto">
           <TopHeaderStat label="Avg OEE Overall" value={`${globalMetrics.avgOee.toFixed(1)}%`} icon={ChartBarIcon} color="blue" />
-          <TopHeaderStat label="Critical Alarms" value={globalMetrics.totalActiveAlarms} icon={ExclamationTriangleIcon} color="red" />
+          <TopHeaderStat label="Critical Alarms" value={globalMetrics.totalActiveAlarms.toString()} icon={ExclamationTriangleIcon} color="red" />
           <TopHeaderStat label="Total Energy" value={`${globalMetrics.totalPower} kW`} icon={BoltIcon} color="amber" />
         </Grid>
       </header>
 
-      {/* SECTION 2: BREADCRUMBS & NAVIGATION */}
+      {/* SECTION 2: NAVIGATION */}
       <div className="flex flex-col lg:flex-row justify-between items-center mb-10 gap-6">
         <TabGroup index={view === "global" ? 0 : view === "plant" ? 1 : 2} className="w-full lg:w-auto">
           <TabList variant="solid" className="bg-slate-900 border-slate-800 p-1 rounded-2xl">
@@ -94,12 +89,12 @@ export default function CentralControlTower() {
         <div className="flex items-center gap-4 w-full lg:w-auto">
            <TextInput icon={MagnifyingGlassIcon} placeholder="Cari Asset / Lini Mesin..." className="md:w-72" />
            <Button variant="secondary" icon={BellIcon} onClick={() => setShowAlarmModal(!showAlarmModal)} className="bg-slate-900 border-slate-800 text-slate-300">
-             Log Alarm ({globalMetrics.totalActiveAlarms})
+              Log Alarm ({globalMetrics.totalActiveAlarms})
            </Button>
         </div>
       </div>
 
-      {/* SECTION 3: CORE CONTENT SWITCHER */}
+      {/* SECTION 3: CONTENT */}
       <div className="space-y-12 min-h-[800px]">
         {view === "global" && (
           <Layer1Global plants={Object.values(DATABASE)} onSelect={handleSelectPlant} />
@@ -122,14 +117,14 @@ export default function CentralControlTower() {
         )}
       </div>
 
-      {/* SECTION 4: FOOTER IDENTITY */}
+      {/* SECTION 4: FOOTER */}
       <footer className="mt-24 border-t border-slate-900 pt-10 flex flex-col md:flex-row justify-between items-center text-slate-600 gap-6">
         <div className="flex items-center gap-3">
           <ShieldCheckIcon className="w-6 h-6 text-emerald-600" />
           <Text className="text-xs uppercase tracking-widest font-bold">Encrypted Industrial Network • Dicky Ardiansyah Architecture</Text>
         </div>
         <div className="flex gap-8 text-[10px] font-mono opacity-50 uppercase tracking-tighter">
-          <span>Server: localhost:3000</span>
+          <span>Server: Vercel Production</span>
           <span>Protocol: MQTT v5.0</span>
           <span>Build: 2026-04-26-PROD</span>
         </div>
@@ -138,25 +133,23 @@ export default function CentralControlTower() {
   );
 }
 
-// ==========================================================
-// LAYER 1: GLOBAL MONITORING (PETA & GLOBAL TABLE)
-// ==========================================================
+// LAYER 1
 function Layer1Global({ plants, onSelect }: any) {
   return (
     <div className="animate-in fade-in zoom-in-[0.98] duration-700">
       <Grid numItemsLg={3} className="gap-8">
         <div className="col-span-2 space-y-8">
-          <Card className="bg-slate-900/40 border-slate-800 p-0 overflow-hidden shadow-2xl ring-1 ring-slate-800 rounded-3xl">
+          <Card className="bg-slate-900/40 border-slate-800 p-0 overflow-hidden shadow-2xl rounded-3xl">
             <MapLayer plants={plants} onSelectPlant={onSelect} />
           </Card>
           
-          <Card className="bg-slate-900/40 border-slate-800 ring-1 ring-slate-800 rounded-3xl">
+          <Card className="bg-slate-900/40 border-slate-800 rounded-3xl">
             <div className="flex justify-between items-center mb-8 px-2">
               <Title className="text-white text-xl flex items-center gap-3">
                 <ClipboardDocumentListIcon className="w-6 h-6 text-blue-500" />
                 Matriks Performa Antar-Fasilitas
               </Title>
-              <Badge color="emerald" variant="light">Update Real-time</Badge>
+              <Badge color="emerald">Update Real-time</Badge>
             </div>
             <Table>
               <TableHead>
@@ -179,7 +172,8 @@ function Layer1Global({ plants, onSelect }: any) {
                        </div>
                     </TableCell>
                     <TableCell>
-                      <Badge color={p.status === "critical" ? "red" : p.status === "warning" ? "yellow" : "emerald"} variant="soft" className="px-4 py-1 font-bold">
+                      {/* FIX: Variant dihapus */}
+                      <Badge color={p.status === "critical" ? "red" : p.status === "warning" ? "yellow" : "emerald"} className="px-4 py-1 font-bold">
                         {p.status.toUpperCase()}
                       </Badge>
                     </TableCell>
@@ -191,7 +185,7 @@ function Layer1Global({ plants, onSelect }: any) {
         </div>
 
         <aside className="space-y-8">
-          <Card className="bg-slate-900/40 border-slate-800 ring-1 ring-slate-800 rounded-3xl">
+          <Card className="bg-slate-900/40 border-slate-800 rounded-3xl">
             <Title className="text-white mb-6 font-black text-center uppercase tracking-widest">Kontribusi Efisiensi</Title>
             <DonutChart
               className="mt-8 h-80"
@@ -199,12 +193,11 @@ function Layer1Global({ plants, onSelect }: any) {
               category="value"
               index="name"
               colors={["blue", "indigo", "emerald", "amber", "rose"]}
-              showAnimation={true}
               variant="donut"
             />
           </Card>
 
-          <Card className="bg-slate-900/40 border-slate-800 ring-1 ring-slate-800 rounded-3xl">
+          <Card className="bg-slate-900/40 border-slate-800 rounded-3xl">
             <Title className="text-white mb-6 flex items-center gap-3">
                <BellIcon className="w-6 h-6 text-red-500" />
                Log Alarm Kritis (FIFO)
@@ -228,19 +221,17 @@ function Layer1Global({ plants, onSelect }: any) {
   );
 }
 
-// ==========================================================
-// LAYER 2: PLANT ANALYTICS (LINI PRODUKSI)
-// ==========================================================
+// LAYER 2
 function Layer2Plant({ plant, liveData, onSelectMachine, onBack }: any) {
   return (
     <div className="animate-in fade-in slide-in-from-right-12 duration-700 space-y-10">
       <Flex justifyContent="between">
          <Button variant="secondary" onClick={onBack} size="xs" className="bg-slate-900 border-slate-800 text-slate-400">← Kembali ke Peta Global</Button>
-         <Badge color="indigo" variant="soft" className="font-mono px-4 py-1">ENCRYPTION: AES-256-BIT</Badge>
+         <Badge color="indigo" className="font-mono px-4 py-1">ENCRYPTION: AES-256-BIT</Badge>
       </Flex>
 
       <Grid numItemsLg={4} className="gap-8">
-        <Card className="bg-slate-900/40 border-slate-800 col-span-3 ring-1 ring-slate-800 rounded-3xl">
+        <Card className="bg-slate-900/40 border-slate-800 col-span-3 rounded-3xl">
           <Flex justifyContent="between" className="mb-12">
             <div>
               <Title className="text-white text-4xl font-black">{plant.name}</Title>
@@ -256,11 +247,11 @@ function Layer2Plant({ plant, liveData, onSelectMachine, onBack }: any) {
             {plant.machines.map((m: any) => {
               const live = liveData[m.id];
               return (
-                <div key={m.id} onClick={() => onSelectMachine(m.id)} className="group p-8 bg-slate-950 border border-slate-800 rounded-[2.5rem] hover:border-indigo-500 hover:shadow-[0_0_50px_rgba(79,70,229,0.1)] transition-all cursor-pointer relative overflow-hidden">
+                <div key={m.id} onClick={() => onSelectMachine(m.id)} className="group p-8 bg-slate-950 border border-slate-800 rounded-[2.5rem] hover:border-indigo-500 transition-all cursor-pointer relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-indigo-500/15 transition-all" />
                   <Flex justifyContent="between" alignItems="start">
                     <div>
-                      <Badge size="xs" color="indigo" variant="soft" className="mb-4 font-mono font-bold tracking-tighter uppercase px-3">{m.id}</Badge>
+                      <Badge size="xs" color="indigo" className="mb-4 font-mono font-bold tracking-tighter uppercase px-3">{m.id}</Badge>
                       <Title className="text-white text-2xl group-hover:text-indigo-400 transition-colors leading-tight font-black">{m.name}</Title>
                     </div>
                     <div className="text-right">
@@ -269,7 +260,7 @@ function Layer2Plant({ plant, liveData, onSelectMachine, onBack }: any) {
                     </div>
                   </Flex>
                   <div className="mt-10 pt-8 border-t border-slate-900 flex justify-between items-center">
-                    <Badge color={live?.status === 'critical' ? 'red' : 'emerald'} variant="dot" className="font-black px-4">
+                    <Badge color={live?.status === 'critical' ? 'red' : 'emerald'} className="font-black px-4">
                       {live?.status?.toUpperCase() || 'ONLINE'}
                     </Badge>
                     <Text className="text-indigo-400 font-black text-xl tracking-tighter">OEE {m.oee}%</Text>
@@ -281,7 +272,7 @@ function Layer2Plant({ plant, liveData, onSelectMachine, onBack }: any) {
         </Card>
 
         <aside className="space-y-8">
-          <Card className="bg-slate-900/40 border-slate-800 ring-1 ring-slate-800 rounded-3xl">
+          <Card className="bg-slate-900/40 border-slate-800 rounded-3xl">
             <Title className="text-white mb-8 font-black flex items-center gap-3">
               <BeakerIcon className="w-6 h-6 text-rose-500" />
               Loss Pareto Analysis
@@ -294,12 +285,12 @@ function Layer2Plant({ plant, liveData, onSelectMachine, onBack }: any) {
                 { name: "Process Failure", value: 20 },
               ]} 
               color="rose"
-              valueFormatter={(v) => `${v}m`}
+              valueFormatter={(v: number) => `${v}m`}
               className="mt-2"
             />
           </Card>
           
-          <Card className="bg-slate-900/40 border-slate-800 ring-1 ring-slate-800 rounded-3xl">
+          <Card className="bg-slate-900/40 border-slate-800 rounded-3xl">
             <Title className="text-white mb-6 flex items-center gap-3">
                <LightBulbIcon className="w-6 h-6 text-amber-500" />
                Predictive Insights
@@ -321,9 +312,7 @@ function Layer2Plant({ plant, liveData, onSelectMachine, onBack }: any) {
   );
 }
 
-// ==========================================================
-// LAYER 3: LIVE TELEMETRY SCADA (SISTEM DETEKSI CEPAT)
-// ==========================================================
+// LAYER 3
 function Layer3Machine({ machine, onBack }: any) {
   const [localHistory, setLocalHistory] = useState<any[]>([]);
 
@@ -355,7 +344,7 @@ function Layer3Machine({ machine, onBack }: any) {
           <Button variant="secondary" size="xs" onClick={onBack} className="mb-8 bg-slate-900 border-slate-800 text-slate-400">← Back to Production Line</Button>
           <div className="flex items-center gap-8">
             <Metric className="text-white text-7xl font-black tracking-tighter leading-none">{machine.name}</Metric>
-            <Badge color={machine.status === 'critical' ? 'red' : 'emerald'} size="xl" className="py-3 px-8 shadow-[0_0_30px_rgba(16,185,129,0.1)] font-black text-lg">
+            <Badge color={machine.status === 'critical' ? 'red' : 'emerald'} size="xl" className="py-3 px-8 font-black text-lg">
               {machine.status.toUpperCase()}
             </Badge>
           </div>
@@ -367,10 +356,10 @@ function Layer3Machine({ machine, onBack }: any) {
       </header>
 
       <Grid numItemsLg={3} className="gap-10">
-        <Card className="bg-slate-900/40 border-slate-800 col-span-2 ring-1 ring-slate-800 rounded-[3rem] p-10 shadow-2xl">
+        <Card className="bg-slate-900/40 border-slate-800 col-span-2 rounded-[3rem] p-10 shadow-2xl">
           <Flex className="mb-8">
             <Title className="text-white text-xl font-black tracking-widest uppercase">Live Thermal Profile Stream</Title>
-            <Badge color="orange" variant="soft" className="px-4 py-1">Sensor: Optic-S101</Badge>
+            <Badge color="orange" className="px-4 py-1">Sensor: Optic-S101</Badge>
           </Flex>
           <AreaChart
             className="h-[500px] mt-10"
@@ -386,7 +375,7 @@ function Layer3Machine({ machine, onBack }: any) {
         </Card>
 
         <div className="space-y-10">
-          <Card className="bg-slate-900/40 border-slate-800 flex flex-col items-center justify-center py-20 rounded-[3rem] ring-1 ring-slate-800 relative overflow-hidden group">
+          <Card className="bg-slate-900/40 border-slate-800 flex flex-col items-center justify-center py-20 rounded-[3rem] relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-b from-amber-500/5 to-transparent blur-3xl rounded-full animate-pulse group-hover:from-amber-500/10 transition-all" />
             <Icon icon={BoltIcon} size="xl" color="amber" variant="light" className="mb-8 animate-pulse" />
             <Text className="text-slate-500 uppercase text-xs font-black tracking-[0.4em] mb-4">Actual Rotational Speed</Text>
@@ -394,7 +383,7 @@ function Layer3Machine({ machine, onBack }: any) {
             <Text className="text-slate-500 font-mono text-sm uppercase tracking-widest font-bold">RPM • Sub-System 01</Text>
           </Card>
 
-          <Card className="bg-slate-900/40 border-slate-800 rounded-[3rem] ring-1 ring-slate-800 p-10">
+          <Card className="bg-slate-900/40 border-slate-800 rounded-[3rem] p-10">
             <Title className="text-white mb-10 font-black flex items-center gap-4 text-xl">
                <AdjustmentsHorizontalIcon className="w-8 h-8 text-indigo-500" />
                Critical Component Health
@@ -412,13 +401,10 @@ function Layer3Machine({ machine, onBack }: any) {
   );
 }
 
-// ==========================================================
-// ATOMIC UI COMPONENTS (Molecules)
-// ==========================================================
-
+// ATOMIC UI
 function TopHeaderStat({ label, value, icon, color }: any) {
   return (
-    <Card className={`bg-slate-900/40 border-slate-800 p-6 ring-1 ring-inset ring-${color}-500/10 rounded-2xl shadow-2xl`}>
+    <Card className={`bg-slate-900/40 border-slate-800 p-6 rounded-2xl shadow-2xl`}>
       <Flex justifyContent="start" className="space-x-5">
         <Icon icon={icon} color={color} variant="light" size="md" className="p-3" />
         <div>
