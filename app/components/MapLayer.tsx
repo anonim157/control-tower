@@ -1,7 +1,7 @@
 "use client";
 
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
+// import "leaflet/dist/leaflet.css";
 
 // 1. Komponen Interaktif untuk Animasi Zoom Peta
 const InteractiveMarker = ({
