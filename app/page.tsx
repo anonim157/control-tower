@@ -185,7 +185,7 @@ export default function Home() {
                 index="time"
                 categories={["SMU1", "SMU2", "TAS"]}
                 colors={["rose", "emerald", "amber"]}
-                valueFormatter={(number) => `${number}%`}
+                valueFormatter={(number: number) => `${number}%`}
                 showLegend={false}
                 showGridLines={false}
                 showYAxis={false}
@@ -202,7 +202,7 @@ export default function Home() {
                 data={batchProductionData} 
                 className="mt-2 text-slate-300 font-mono text-xs" 
                 color="blue" 
-                valueFormatter={(number) => Intl.NumberFormat("id").format(number).toString()}
+                valueFormatter={(number: number) => Intl.NumberFormat("id").format(number).toString()}
               />
             </Card>
 
