@@ -158,7 +158,6 @@ export default function Home() {
                 index="time"
                 categories={["Plant1", "Plant2", "Whse"]}
                 colors={["rose", "emerald", "amber"]}
-                // PERBAIKAN TYPESCRIPT ERROR DI SINI
                 valueFormatter={(number: number) => `${number}%`}
                 showLegend={false}
                 showGridLines={false}
@@ -175,7 +174,6 @@ export default function Home() {
                 data={batchProductionData} 
                 className="mt-2 text-slate-300 font-mono text-xs" 
                 color="blue" 
-                // PERBAIKAN TYPESCRIPT ERROR DI SINI
                 valueFormatter={(number: number) => Intl.NumberFormat("id").format(number).toString()}
               />
             </Card>
