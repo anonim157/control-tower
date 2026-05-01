@@ -4,9 +4,7 @@ import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap, Polygon, Polyline } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-// ==========================================
-// 1. STYLING KHUSUS DARK MODE SCADA
-// ==========================================
+// Styling Custom untuk Popup agar tetap modern
 const MapCustomStyles = () => (
   <style>{`
     .leaflet-popup-content-wrapper {
@@ -26,18 +24,9 @@ const MapCustomStyles = () => (
       background-color: #0f172a !important;
       border: 1px solid #1e293b;
     }
-    .leaflet-container {
-      background-color: #020617; 
-      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    }
     .leaflet-control-zoom a {
-      background-color: #1e293b !important;
-      color: #94a3b8 !important;
-      border-color: #334155 !important;
-    }
-    .leaflet-control-zoom a:hover {
-      background-color: #334155 !important;
-      color: #f8fafc !important;
+      background-color: #ffffff !important;
+      color: #334155 !important;
     }
     .pulse-animation {
       animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -49,12 +38,8 @@ const MapCustomStyles = () => (
   `}</style>
 );
 
-// ==========================================
-// 2. DATA MASIF GEOSPASIAL & ASET PABRIK
-// ==========================================
 const defaultCenter: [number, number] = [-6.2100, 106.9000];
 
-// Koordinat untuk menggambar batas wilayah pabrik (Geofencing)
 const smu1Polygon: [number, number][] = [
   [-6.183, 106.913], [-6.183, 106.917], [-6.187, 106.917], [-6.187, 106.913]
 ];
@@ -65,16 +50,14 @@ const tasPolygon: [number, number][] = [
   [-6.298, 107.148], [-6.298, 107.152], [-6.302, 107.152], [-6.302, 107.148]
 ];
 
-// Jalur logistik antar pabrik (Supply Chain Route)
 const supplyRoute: [number, number][] = [
   [-6.185, 106.915], [-6.200, 106.950], [-6.250, 107.050], [-6.300, 107.150]
 ];
 
-// Basis data aset awal
 const initialFactoryData = [
   { 
-    id: "SMU1", 
-    name: "SMU 1 - Liquid Plant", 
+    id: "Plant1", 
+    name: "Plant 1 - Liquid", 
     pos: [-6.185, 106.915] as [number, number], 
     color: "#ef4444", 
     status: "CRITICAL", 
@@ -87,8 +70,8 @@ const initialFactoryData = [
     }
   },
   { 
-    id: "SMU2", 
-    name: "SMU 2 - Powder Plant", 
+    id: "Plant2", 
+    name: "Plant 2 - Powder", 
     pos: [-6.170, 106.910] as [number, number], 
     color: "#10b981", 
     status: "RUNNING", 
@@ -101,8 +84,8 @@ const initialFactoryData = [
     }
   },
   { 
-    id: "TAS", 
-    name: "TAS - Mega Warehouse", 
+    id: "Whse", 
+    name: "Mega Warehouse", 
     pos: [-6.300, 107.150] as [number, number], 
     color: "#f59e0b", 
     status: "WARNING", 
@@ -116,9 +99,6 @@ const initialFactoryData = [
   },
 ];
 
-// ==========================================
-// 3. KOMPONEN MARKER INTERAKTIF
-// ==========================================
 const InteractiveMarker = ({ data, mapControl }: { data: any, mapControl: any }) => {
   return (
     <CircleMarker
@@ -139,8 +119,6 @@ const InteractiveMarker = ({ data, mapControl }: { data: any, mapControl: any })
     >
       <Popup className="custom-popup">
         <div className="flex flex-col bg-slate-900 rounded-xl overflow-hidden shadow-2xl border border-slate-700">
-          
-          {/* Bagian Header Popup */}
           <div className="bg-slate-800 px-4 py-3 border-b border-slate-700 flex justify-between items-center">
             <span className="font-bold text-slate-100 text-sm uppercase tracking-wider">
               {data.name}
@@ -152,19 +130,13 @@ const InteractiveMarker = ({ data, mapControl }: { data: any, mapControl: any })
               {data.status}
             </span>
           </div>
-
-          {/* Bagian Konten Popup */}
           <div className="p-4 flex flex-col gap-3">
-            
-            {/* OEE Meter */}
             <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 flex items-center justify-between">
               <span className="text-slate-400 text-xs uppercase font-semibold">Live OEE</span>
               <span className="font-mono text-2xl font-bold" style={{ color: data.color }}>
                 {data.oee.toFixed(1)}%
               </span>
             </div>
-
-            {/* Spesifikasi Telemetri */}
             <div className="grid grid-cols-2 gap-2 mt-1">
               <div className="bg-slate-800/50 p-2 rounded border border-slate-700">
                 <span className="block text-[10px] text-slate-500 uppercase">Energy Load</span>
@@ -183,13 +155,11 @@ const InteractiveMarker = ({ data, mapControl }: { data: any, mapControl: any })
                 <span className="block text-xs text-slate-200 font-semibold">{data.details.vision}</span>
               </div>
             </div>
-
-            {/* Tombol Aksi */}
             <div className="flex gap-2 mt-2">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  alert(`Sending Modbus TCP Reset Command to ${data.id}...`);
+                  alert(`Sending Ping to ${data.id}...`);
                 }}
                 className="flex-1 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-600/50 text-[11px] font-semibold py-2 rounded transition-all"
               >
@@ -212,23 +182,15 @@ const InteractiveMarker = ({ data, mapControl }: { data: any, mapControl: any })
   );
 };
 
-// ==========================================
-// 4. MAP CONTROLLER (Helper untuk FlyTo)
-// ==========================================
 const MapController = ({ factoryData }: { factoryData: any[] }) => {
   const map = useMap();
   
   return (
     <>
-      {/* Menggambar Geofence Area Pabrik */}
       <Polygon positions={smu1Polygon} pathOptions={{ color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.1, weight: 1, dashArray: '4' }} />
       <Polygon positions={smu2Polygon} pathOptions={{ color: '#10b981', fillColor: '#10b981', fillOpacity: 0.1, weight: 1, dashArray: '4' }} />
       <Polygon positions={tasPolygon} pathOptions={{ color: '#f59e0b', fillColor: '#f59e0b', fillOpacity: 0.1, weight: 1, dashArray: '4' }} />
-      
-      {/* Menggambar Rute Suplai Logistik */}
       <Polyline positions={supplyRoute} pathOptions={{ color: '#3b82f6', weight: 2, opacity: 0.5, dashArray: '10, 10' }} />
-
-      {/* Render Semua Marker Pabrik */}
       {factoryData.map((plant) => (
         <InteractiveMarker key={plant.id} data={plant} mapControl={map} />
       ))}
@@ -236,30 +198,22 @@ const MapController = ({ factoryData }: { factoryData: any[] }) => {
   );
 };
 
-// ==========================================
-// 5. KOMPONEN PETA UTAMA
-// ==========================================
 export default function MapLayer() {
   const [factories, setFactories] = useState(initialFactoryData);
 
-  // Efek Simulasi Real-time (Fluktuasi nilai OEE layaknya data SCADA asli)
   useEffect(() => {
     const interval = setInterval(() => {
       setFactories((prev) => 
         prev.map((factory) => {
-          // Buat fluktuasi random antara -1% hingga +1%
           const fluctuation = (Math.random() * 2 - 1);
           let newOee = factory.oee + fluctuation;
-          
-          // Batasi nilai OEE
           if (newOee > 100) newOee = 100;
           if (newOee < 0) newOee = 0;
 
-          // Update warna berdasarkan OEE threshold
           let newStatus = factory.status;
           let newColor = factory.color;
           
-          if (factory.id !== "SMU1") { // SMU 1 diset critical terus untuk demo
+          if (factory.id !== "Plant1") { 
             if (newOee >= 85) {
               newStatus = "RUNNING"; newColor = "#10b981";
             } else if (newOee >= 60) {
@@ -268,20 +222,16 @@ export default function MapLayer() {
               newStatus = "CRITICAL"; newColor = "#ef4444";
             }
           }
-
           return { ...factory, oee: newOee, status: newStatus, color: newColor };
         })
       );
-    }, 3000); // Update setiap 3 detik
-
+    }, 3000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="relative w-full h-screen overflow-hidden z-0 bg-[#020617]">
+    <div className="relative w-full h-screen overflow-hidden z-0">
       <MapCustomStyles />
-      
-      {/* Indikator Live Data (Background) */}
       <div className="absolute bottom-6 left-6 z-[400] bg-slate-900/80 backdrop-blur border border-slate-700 px-3 py-2 rounded-lg flex items-center gap-3">
         <div className="flex space-x-1">
           <div className="w-2 h-4 bg-emerald-500 animate-pulse rounded-sm"></div>
@@ -291,15 +241,11 @@ export default function MapLayer() {
         <span className="text-xs text-emerald-400 font-mono tracking-widest uppercase">PostgreSQL Syncing</span>
       </div>
 
-      <MapContainer 
-        center={defaultCenter} 
-        zoom={11} 
-        zoomControl={true} 
-        className="w-full h-full"
-      >
+      <MapContainer center={defaultCenter} zoom={11} zoomControl={true} className="w-full h-full">
+        {/* Menggunakan peta terang (OpenStreetMap standard) */}
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         <MapController factoryData={factories} />
       </MapContainer>

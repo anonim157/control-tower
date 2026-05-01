@@ -8,12 +8,7 @@ import {
   TableHead, TableHeaderCell, TableBody, TableRow, TableCell, Badge
 } from "@tremor/react";
 
-// Import peta tanpa SSR
 const MapLayer = dynamic(() => import("./components/MapLayer"), { ssr: false });
-
-// ==========================================
-// DATA DUMMY EKSTENSIF UNTUK MENGISI DASHBOARD
-// ==========================================
 
 const uptimeHistory = [
   { color: "emerald", tooltip: "00:00 - Normal" }, { color: "emerald", tooltip: "01:00 - Normal" }, 
@@ -36,33 +31,29 @@ const batchProductionData = [
 ];
 
 const oeeTrendData = [
-  { time: "08:00", SMU1: 45, SMU2: 88, TAS: 70 },
-  { time: "09:00", SMU1: 48, SMU2: 89, TAS: 71 },
-  { time: "10:00", SMU1: 30, SMU2: 90, TAS: 75 },
-  { time: "11:00", SMU1: 25, SMU2: 87, TAS: 74 },
-  { time: "12:00", SMU1: 40, SMU2: 85, TAS: 72 },
-  { time: "13:00", SMU1: 45, SMU2: 89, TAS: 68 },
-  { time: "14:00", SMU1: 45, SMU2: 91, TAS: 70 },
-  { time: "15:00", SMU1: 47, SMU2: 90, TAS: 72 },
+  { time: "08:00", Plant1: 45, Plant2: 88, Whse: 70 },
+  { time: "09:00", Plant1: 48, Plant2: 89, Whse: 71 },
+  { time: "10:00", Plant1: 30, Plant2: 90, Whse: 75 },
+  { time: "11:00", Plant1: 25, Plant2: 87, Whse: 74 },
+  { time: "12:00", Plant1: 40, Plant2: 85, Whse: 72 },
+  { time: "13:00", Plant1: 45, Plant2: 89, Whse: 68 },
+  { time: "14:00", Plant1: 45, Plant2: 91, Whse: 70 },
+  { time: "15:00", Plant1: 47, Plant2: 90, Whse: 72 },
 ];
 
 const alarmLogs = [
-  { id: "ALM-001", time: "15:42:11", plant: "SMU 1", machine: "Mixer Tank 3", type: "High Temp", status: "Active", severity: "Critical" },
-  { id: "ALM-002", time: "15:30:05", plant: "SMU 2", machine: "JAKA Zu Palletizer", type: "Payload Warning", status: "Ack", severity: "Warning" },
-  { id: "ALM-003", time: "14:15:22", plant: "TAS", machine: "Conveyor Belt B", type: "Vibration High", status: "Resolved", severity: "Info" },
-  { id: "ALM-004", time: "13:05:10", plant: "SMU 1", machine: "Node-RED Gateway", type: "Comm Loss", status: "Resolved", severity: "Critical" },
-  { id: "ALM-005", time: "11:50:00", plant: "SMU 2", machine: "YOLOv8 Vision", type: "Low Light Conf", status: "Ack", severity: "Warning" },
-  { id: "ALM-006", time: "10:20:44", plant: "SMU 1", machine: "Pneumatic Valve 2", type: "Air Leak", status: "Active", severity: "Critical" },
+  { id: "ALM-001", time: "15:42:11", plant: "Plant 1", machine: "Mixer Tank 3", type: "High Temp", status: "Active", severity: "Critical" },
+  { id: "ALM-002", time: "15:30:05", plant: "Plant 2", machine: "JAKA Zu Palletizer", type: "Payload Warning", status: "Ack", severity: "Warning" },
+  { id: "ALM-003", time: "14:15:22", plant: "Whse", machine: "Conveyor Belt B", type: "Vibration High", status: "Resolved", severity: "Info" },
+  { id: "ALM-004", time: "13:05:10", plant: "Plant 1", machine: "Node-RED Gateway", type: "Comm Loss", status: "Resolved", severity: "Critical" },
+  { id: "ALM-005", time: "11:50:00", plant: "Plant 2", machine: "YOLOv8 Vision", type: "Low Light Conf", status: "Ack", severity: "Warning" },
+  { id: "ALM-006", time: "10:20:44", plant: "Plant 1", machine: "Pneumatic Valve 2", type: "Air Leak", status: "Active", severity: "Critical" },
 ];
 
-// ==========================================
-// KOMPONEN UTAMA DASHBOARD
-// ==========================================
 export default function Home() {
   const [currentTime, setCurrentTime] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
 
-  // Jam Digital Real-time di Header
   useEffect(() => {
     const timer = setInterval(() => {
       const now = new Date();
@@ -72,39 +63,27 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="relative h-screen w-full overflow-hidden bg-[#020617] font-sans selection:bg-emerald-500/30 text-slate-200">
+    <main className="relative h-screen w-full overflow-hidden bg-slate-900 font-sans selection:bg-emerald-500/30 text-slate-200">
       
-      {/* ==========================================
-          LAYER 1: BACKGROUND PETA (Z-INDEX 0)
-          ========================================== */}
       <div className="absolute inset-0 z-0">
         <MapLayer />
-        {/* Shadow Overlay untuk transisi halus antara UI dan Peta */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#020617]/80 to-transparent pointer-events-none z-0 w-1/2" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/50 to-transparent pointer-events-none z-0 h-full" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/60 to-transparent pointer-events-none z-0 w-1/2" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent pointer-events-none z-0 h-full" />
       </div>
 
-      {/* ==========================================
-          LAYER 2: FOREGROUND UI (Z-INDEX 10)
-          ========================================== */}
       <div className="relative z-10 pointer-events-none h-full flex flex-col justify-between">
         
-        {/* --- HEADER NAVBAR --- */}
-        <div className="pointer-events-auto w-full px-6 py-4 flex justify-between items-start lg:items-center bg-slate-900/60 backdrop-blur-xl border-b border-slate-800/80 shadow-2xl">
+        <div className="pointer-events-auto w-full px-6 py-4 flex justify-between items-start lg:items-center bg-slate-900/80 backdrop-blur-md border-b border-slate-800 shadow-2xl">
           <div className="flex flex-col">
-            <Text className="text-emerald-500 font-bold tracking-[0.2em] text-[10px] uppercase">
-              Sayap Mas Utama • Manufacture Digitalization
-            </Text>
             <h1 className="text-3xl font-extrabold text-white tracking-tight mt-1 flex items-center gap-3">
-              Geospatial Control Tower
+              Control Tower build dicky ardiansyah
               <span className="bg-slate-800 text-slate-300 text-xs px-2 py-1 rounded border border-slate-700 font-mono font-normal">
-                v2.4.1
+                v2.4.2
               </span>
             </h1>
           </div>
 
           <div className="flex gap-6 items-center">
-            {/* Tab Navigasi */}
             <div className="hidden lg:flex bg-slate-950/50 p-1 rounded-lg border border-slate-800">
               <button 
                 onClick={() => setActiveTab("overview")}
@@ -126,7 +105,6 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Indikator Sistem */}
             <div className="flex flex-col items-end border-l border-slate-700 pl-6">
               <div className="flex items-center gap-2">
                 <span className="relative flex h-2.5 w-2.5">
@@ -140,14 +118,10 @@ export default function Home() {
           </div>
         </div>
 
-        {/* --- MAIN CONTENT AREA (Kiri dan Bawah) --- */}
         <div className="flex-1 p-6 flex flex-col gap-6 justify-between overflow-hidden">
           
-          {/* PANEL KIRI (SIDEBAR ANALITIK) */}
           <div className="pointer-events-auto w-full md:w-[420px] flex flex-col gap-4 overflow-y-auto pr-2 scrollbar-hide max-h-[calc(100vh-280px)]">
-            
-            {/* KPI CARD: OVERALL OEE */}
-            <Card className="bg-slate-900/60 backdrop-blur-xl border-slate-700/50 ring-1 ring-white/5 shadow-2xl">
+            <Card className="bg-slate-900/80 backdrop-blur-md border-slate-700/50 ring-1 ring-white/5 shadow-2xl">
               <div className="flex justify-between items-start">
                 <div>
                   <Text className="text-slate-400 uppercase text-[10px] font-bold tracking-widest">Enterprise OEE Average</Text>
@@ -176,15 +150,15 @@ export default function Home() {
               />
             </Card>
 
-            {/* KPI CARD: HISTORIS TREND */}
-            <Card className="bg-slate-900/60 backdrop-blur-xl border-slate-700/50 ring-1 ring-white/5 shadow-2xl">
+            <Card className="bg-slate-900/80 backdrop-blur-md border-slate-700/50 ring-1 ring-white/5 shadow-2xl">
               <Text className="text-slate-400 uppercase text-[10px] font-bold tracking-widest mb-4">OEE Trend Analysis (Real-time)</Text>
               <AreaChart
                 className="h-40 mt-4"
                 data={oeeTrendData}
                 index="time"
-                categories={["SMU1", "SMU2", "TAS"]}
+                categories={["Plant1", "Plant2", "Whse"]}
                 colors={["rose", "emerald", "amber"]}
+                // PERBAIKAN TYPESCRIPT ERROR DI SINI
                 valueFormatter={(number: number) => `${number}%`}
                 showLegend={false}
                 showGridLines={false}
@@ -192,8 +166,7 @@ export default function Home() {
               />
             </Card>
 
-            {/* KPI CARD: PRODUCTION BATCH */}
-            <Card className="bg-slate-900/60 backdrop-blur-xl border-slate-700/50 ring-1 ring-white/5 shadow-2xl">
+            <Card className="bg-slate-900/80 backdrop-blur-md border-slate-700/50 ring-1 ring-white/5 shadow-2xl">
               <div className="flex justify-between items-center mb-4">
                 <Text className="text-slate-400 uppercase text-[10px] font-bold tracking-widest">Live Batch Output (Kg)</Text>
                 <Badge color="blue" size="xs">Shift 1</Badge>
@@ -202,21 +175,20 @@ export default function Home() {
                 data={batchProductionData} 
                 className="mt-2 text-slate-300 font-mono text-xs" 
                 color="blue" 
+                // PERBAIKAN TYPESCRIPT ERROR DI SINI
                 valueFormatter={(number: number) => Intl.NumberFormat("id").format(number).toString()}
               />
             </Card>
 
-            {/* KPI CARD: MACHINE UPTIME TRACKER */}
-            <Card className="bg-slate-900/60 backdrop-blur-xl border-slate-700/50 ring-1 ring-white/5 shadow-2xl mb-4">
+            <Card className="bg-slate-900/80 backdrop-blur-md border-slate-700/50 ring-1 ring-white/5 shadow-2xl mb-4">
               <Text className="text-slate-400 uppercase text-[10px] font-bold tracking-widest mb-3">Critical Asset Uptime (24h)</Text>
               <Text className="text-white text-sm mb-1">Main Liquid Mixer - Plant 1</Text>
               <Tracker data={uptimeHistory} className="mt-2 w-full" />
             </Card>
           </div>
 
-          {/* PANEL BAWAH (LOG ALARM TABLE) */}
           <div className="pointer-events-auto w-full max-h-[220px]">
-            <Card className="bg-slate-900/80 backdrop-blur-xl border-slate-700 ring-1 ring-white/5 shadow-2xl h-full flex flex-col p-0 overflow-hidden">
+            <Card className="bg-slate-900/80 backdrop-blur-md border-slate-700 ring-1 ring-white/5 shadow-2xl h-full flex flex-col p-0 overflow-hidden">
               <div className="px-6 py-3 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
                 <Text className="text-slate-300 font-bold uppercase tracking-wider text-xs">Centralized Alarm Log (FIFO)</Text>
                 <button className="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1 rounded border border-slate-600 transition-colors">
@@ -260,7 +232,6 @@ export default function Home() {
               </div>
             </Card>
           </div>
-
         </div>
       </div>
     </main>
