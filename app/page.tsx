@@ -1,3 +1,4 @@
+"use client";
 import dynamic from "next/dynamic";
 import { Card, Text, Metric, Flex, BadgeDelta, Grid } from "@tremor/react";
 
